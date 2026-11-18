@@ -12,6 +12,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final search = TextEditingController();
+  final categories = ["전체", "디지털기기", "도서", "의류", "가구", "스포츠", "음반", "게임", "기타"];
 
   @override
   Widget build(BuildContext context) {
@@ -32,16 +33,59 @@ class _HomeScreenState extends State<HomeScreen> {
                   r: 30,
                   p: icon('ic_search', c: eleColor),
                 ),
-                // SizedBox(
-                //   height: 35,
-                //   child: ListView.separated(
-                //     scrollDirection: .horizontal,
-                //     itemBuilder: itemBuilder,
-                //     separatorBuilder: separatorBuilder,
-                //     itemCount: itemCount,
-                //   ),
-                // ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  height: 30,
+                  child: ListView.separated(
+                    scrollDirection: .horizontal,
+                    itemBuilder: (context, index) =>
+                        categoryChip(index, categories[index]),
+                    separatorBuilder: (_, _) => SizedBox(width: 8),
+                    itemCount: categories.length,
+                  ),
+                ),
+                const SizedBox(height: 10),
               ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget categoryChip(int index, String value) {
+    final isSelected = appController.selectCategories.contains(value);
+    final isAll = index == 0;
+    final allSelect = appController.selectCategories.isEmpty && isAll;
+    return GestureDetector(
+      onTap: () async {
+        if (isAll) {
+          appController.selectCategories.clear();
+        } else {
+          appController.selectCategories.add(value);
+        }
+        await appController.query();
+        updateScreen();
+      },
+      child: Container(
+        padding: const .symmetric(horizontal: 12),
+        decoration: BoxDecoration(
+          color: isSelected || allSelect
+              ? mainColor
+              : isAll
+              ? Colors.grey.shade300
+              : fieldColor,
+          borderRadius: .circular(20),
+        ),
+        child: Center(
+          child: Text(
+            value,
+            style: TextStyle(
+              color: isSelected || allSelect
+                  ? Colors.white
+                  : Colors.grey.shade700,
+              fontWeight: .bold,
+              fontSize: 12,
             ),
           ),
         ),
@@ -57,7 +101,11 @@ class _HomeScreenState extends State<HomeScreen> {
           Image.asset('assets/app_icon.png', height: 35),
           const Text('Pocket Market', style: TextStyle(fontWeight: .bold)),
           const Spacer(),
-          GestureDetector(onTap: () {}, child: icon('ic_barcode')),
+          GestureDetector(
+            onTap: () {
+            },
+            child: icon('ic_barcode'),
+          ),
           GestureDetector(
             onTap: () {},
             child: SizedBox(

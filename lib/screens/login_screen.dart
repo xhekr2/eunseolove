@@ -57,14 +57,18 @@ class _LoginScreenState extends State<LoginScreen> {
         "password": password.text,
       });
 
+      final body = jsonDecode(res.body);
+
       if (res.statusCode == 200) {
-        token = jsonDecode(res.body)['accessToken'];
+        token = body['accessToken'];
         await appController.prefs.setString(tokenKey, token!);
         appController.polling();
         rePush(BaseScreen());
+      } else {
+        showToast(body['message']);
       }
-    } catch (e, st) {
-      snackBar(context, 'post 요청에 실패했습니다..\n$st');
+    } catch (e) {
+      print(e);
     }
   }
 
@@ -103,7 +107,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               p: icon('ic_lock', c: passwordError ? errorColor2 : eleColor),
               error: passwordError,
-              errText: '비밀번호는 8자 이상으로 작성해주세요',
+              errText: '비밀번호는 8자 이상 입력해 주세요.',
               obscure: obsPW,
             ),
             const SizedBox(height: 30),

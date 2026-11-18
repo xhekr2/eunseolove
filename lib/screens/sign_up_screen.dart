@@ -29,7 +29,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   void signUp() async {
     if (!isAgree) {
-      snackBar(context, '이용약관에 동의해 주세요.');
+      showToast('이용약관에 동의해 주세요.');
       return;
     }
 
@@ -45,14 +45,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
       final body = jsonDecode(res.body);
 
       if (res.statusCode == 201) {
-        snackBar(context, body['message']);
+        showToast(body['message']);
         pop();
       } else {
-        snackBar(context, body['message']);
+        showToast(body['message']);
         return;
       }
     } catch (e, st) {
-      snackBar(context, 'post 요청에 오류가 발생했습니다. $st');
+      showToast('$st');
     }
   }
 
@@ -112,6 +112,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               children: [
                 Expanded(
                   child: TextField(
+                    keyboardType: .number,
                     maxLength: 3,
                     textAlign: .center,
                     controller: num1,
@@ -136,6 +137,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 Text('-', style: TextStyle(fontSize: 18)),
                 Expanded(
                   child: TextField(
+                    keyboardType: .number,
                     maxLength: 4,
                     textAlign: .center,
                     focusNode: numF2,
@@ -161,6 +163,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 Text('-', style: TextStyle(fontSize: 18)),
                 Expanded(
                   child: TextField(
+                    keyboardType: .number,
                     maxLength: 4,
                     textAlign: .center,
                     controller: num3,

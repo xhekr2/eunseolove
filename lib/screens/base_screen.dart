@@ -24,7 +24,7 @@ class _BaseScreenState extends State<BaseScreen> {
           currentIndex: appController.currentIndex,
           onTap: (i) => setState(() {
             if (i == 2 || i == 3) {
-              snackBar(context, '준비중입니다.');
+              showToast('준비중입니다.');
               return;
             }
             appController.currentIndex = i;

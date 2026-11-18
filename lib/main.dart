@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pocket_market_module_a/controllers/app_controller.dart';
+import 'package:pocket_market_module_a/screens/base_screen.dart';
 import 'package:pocket_market_module_a/screens/login_screen.dart';
 import 'package:pocket_market_module_a/store.dart';
 
@@ -14,7 +15,7 @@ void main() async {
   runApp(
     MaterialApp(
       navigatorKey: navKey,
-      home: LoginScreen(),
+      home: appController.validToken ? BaseScreen() : LoginScreen(),
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         scaffoldBackgroundColor: bgColor,

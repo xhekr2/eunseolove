@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart';
 
 final ValueNotifier<int> updateCount = ValueNotifier(0);
@@ -27,6 +28,12 @@ void rePush(Widget page) => navKey.currentState?.pushAndRemoveUntil(
 );
 
 void pop() => navKey.currentState?.pop();
+
+//
+
+final mc = MethodChannel('channel');
+
+void showToast(String message) => mc.invokeMethod('toast', message);
 
 // HTTP
 

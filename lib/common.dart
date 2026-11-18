@@ -1,12 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pocket_market_module_a/store.dart';
 
-void snackBar(BuildContext context, String s) {
-  ScaffoldMessenger.of(context)
-    ..removeCurrentSnackBar()
-    ..showSnackBar(SnackBar(content: Text(s)));
-}
-
 Widget icon(String asset, {double? w, double? h, Color? c}) {
   return Image.asset(
     'assets/icons/$asset.png',
@@ -75,9 +69,9 @@ Widget textField(
           : null,
       filled: true,
       fillColor: (error ?? false) ? errorColor1 : fieldColor,
-      error: (error ?? false)
+      error: error ?? false
           ? Text(
-              errText ?? '',
+              errText!,
               style: TextStyle(fontWeight: .bold, color: errorColor2),
             )
           : null,
