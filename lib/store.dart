@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart';
+import 'package:intl/intl.dart';
 
 final ValueNotifier<int> updateCount = ValueNotifier(0);
 
@@ -14,6 +15,8 @@ const errorColor1 = Color(0xFFFDF1F1);
 const errorColor2 = Color(0xFFed3737);
 const fieldColor = Color(0xFFF6F6F7);
 const eleColor = Color(0xFF969eab);
+
+String format(int number) => NumberFormat('#,###').format(number);
 
 // Navigator
 

@@ -20,6 +20,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final num2 = TextEditingController();
   final num3 = TextEditingController();
 
+  String? emailErr;
+  String? passErr;
+  String? checkErr;
+  String? nameErr;
+  String? numErr;
+
   final numF2 = FocusNode();
   final numF3 = FocusNode();
 
@@ -30,6 +36,67 @@ class _SignUpScreenState extends State<SignUpScreen> {
   void signUp() async {
     if (!isAgree) {
       showToast('이용약관에 동의해 주세요.');
+      return;
+    }
+
+    emailErr = null;
+    passErr = null;
+    checkErr = null;
+    nameErr = null;
+    numErr = null;
+
+    setState(() {});
+
+    if (email.text.isEmpty) {
+      emailErr = '이메일은 필수 입력 값입니다.';
+    } else if (!email.text.contains('@')) {
+      emailErr = '이메일에 "@"기호를 포함해주세요.';
+    } else if (!email.text.contains('.')) {
+      emailErr = '이메일에 "."기호를 포함해주세요.';
+    } else if (email.text.split('@').first.contains('.')) {
+      emailErr = '"@" 앞에 "."사용은 불가능 합니다.';
+    }
+
+    if (password.text.isEmpty) {
+      passErr = '비밀번호는 필수 입력 값입니다.';
+    } else if (password.text.length < 8) {
+      passErr = '비밀번호를 8자 이상 작성해주세요.';
+    } else if (!password.text.contains(RegExp(r'[A-Z]'))) {
+      passErr = '비밀번호에 대문자 1자 이상 작성해주세요.';
+    } else if (!password.text.contains(RegExp(r'[a-z]'))) {
+      passErr = '비밀번호에 소문자 1자 이상 작성해주세요.';
+    } else if (!password.text.contains(RegExp(r'[0-9]'))) {
+      passErr = '비밀번호에 숫자 1자 이상 작성해주세요.';
+    } else if (!password.text.contains(RegExp(r'[^ㄱ-ㅎ가-힣a-zA-Z0-9\s]'))) {
+      passErr = '비밀번호에 특수문자 1자 이상 작성해주세요.';
+    }
+
+    if (passwordCheck.text.isEmpty) {
+      checkErr = '비밀번호 확인은 필수 입력 값입니다.';
+    } else if (passwordCheck.text != password.text) {
+      checkErr = '비밀번호 확인은 비밀번호와 일치해야 합니다.';
+    }
+
+    if (name.text.isEmpty) {
+      nameErr = '이름은 필수 입력 값입니다.';
+    } else if (name.text.contains(RegExp(r'[^ㄱ-ㅎ가-힣a-zA-Z]'))) {
+      nameErr = '이름은 한글 또는 영문만 입력 가능합니다.';
+    }
+
+    if (num1.text.isEmpty || num2.text.isEmpty || num3.text.isEmpty) {
+      numErr = '휴대폰 번호는 필수 입력 값입니다.';
+    } else if (num1.text.contains(RegExp(r'[^0-9]')) ||
+        num1.text.contains(RegExp(r'[^0-9]')) ||
+        num1.text.contains(RegExp(r'[^0-9]'))) {
+      numErr = '휴대폰 번호는 숫자만 입력 가능합니다.';
+    }
+    setState(() {});
+
+    if (emailErr != null ||
+        passErr != null ||
+        checkErr != null ||
+        nameErr != null ||
+        numErr != null) {
       return;
     }
 
@@ -59,6 +126,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         leading: Padding(
           padding: const EdgeInsets.all(12),
@@ -68,11 +136,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12),
-        child: ListView(
+        child: Column(
           children: [
             title('이메일', s: 14),
             const SizedBox(height: 10),
-            textField(email, 'example@email.com'),
+            textField(
+              email,
+              'example@email.com',
+              errText: emailErr,
+              error: emailErr != null,
+            ),
             const SizedBox(height: 12),
             title('비밀번호', s: 14),
             const SizedBox(height: 10),
@@ -84,6 +157,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 onTap: () => setState(() => obscurePw = !obscurePw),
                 child: icon(obscurePw ? 'ic_eye_off' : 'ic_eye', c: eleColor),
               ),
+              errText: passErr,
+              error: passErr != null,
             ),
             const SizedBox(height: 12),
             title('비밀번호 확인', s: 14),
@@ -92,6 +167,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
               passwordCheck,
               '비밀번호를 한 번 더 입력하세요',
               obscure: obscurePwCheck,
+              error: checkErr != null,
+              errText: checkErr,
               s: GestureDetector(
                 onTap: () => setState(() => obscurePwCheck = !obscurePwCheck),
                 child: icon(
@@ -103,7 +180,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
             const SizedBox(height: 12),
             title('이름', s: 14),
             const SizedBox(height: 10),
-            textField(name, '이름을 입력하세요'),
+            textField(
+              name,
+              '이름을 입력하세요',
+              errText: nameErr,
+              error: nameErr != null,
+            ),
             const SizedBox(height: 12),
             title('휴대폰 번호', s: 14),
             const SizedBox(height: 10),
@@ -169,7 +251,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     controller: num3,
                     focusNode: numF3,
                     decoration: InputDecoration(
-                      counter: SizedBox(),
+                      counter: const SizedBox(),
                       filled: true,
                       fillColor: fieldColor,
                       hintText: '0000',
@@ -183,6 +265,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
               ],
             ),
+            if (numErr != null)
+              Align(
+                alignment: .centerRight,
+                child: Text(
+                  numErr!,
+                  style: TextStyle(color: errorColor2, fontSize: 12),
+                ),
+              ),
             const SizedBox(height: 5),
             Row(
               children: [
@@ -210,7 +300,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 120),
+            const Spacer(),
             GestureDetector(
               onTap: signUp,
               child: Container(
@@ -227,31 +317,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
               ),
             ),
+            const SizedBox(height: 10),
           ],
         ),
       ),
     );
   }
 }
-
-// enum EmailErrorType {
-//   empty('이메일은 필수 값입니다.'),
-//   notCoA('이메일에 @를 필수로 작성해주세요.'),
-//   notCoDot('이메일에 .을 필수로 작성해주세요.'),
-//   beforeCoDot('이메일에서 @앞에 .은 사용 불가능 합니다.');
-//
-//   final String msg;
-//
-//   const new(this.msg);
-// }
-//
-// enum PasswordErrorType {
-//   empty('비밀번호는 필수 값입니다.'),
-//   noEnoLen('비밀번호를 8자 이상으로 작성해주세요.'),
-//   noUpper('비밀번호를 대문자 1자 이상으로 작성해주세요.'),
-//   noLower('비밀번호를 소문자 1자 이상으로 작성해주세요.');
-//
-//   final String msg;
-//
-//   const new(this.msg);
-// }

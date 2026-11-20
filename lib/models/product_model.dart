@@ -1,7 +1,7 @@
 class ProductModel {
   final int id, price, likes;
   final String name, category, condition, tradeType, imageUrl;
-  final bool isFavorite;
+  bool isFavorite;
   final DateTime createdAt;
 
   new({

@@ -19,8 +19,8 @@ Widget image(String asset, {double? w, double? h, Color? c}) {
   );
 }
 
-Widget imageNet(String url, {double? w, double? h, Color? c}) {
-  return Image.network(url, width: w, height: h ?? 24, color: c);
+Widget imageNet(String url, {double? w, double? h, Color? c, BoxFit? f}) {
+  return Image.network(url, width: w, height: h ?? 24, color: c, fit: f);
 }
 
 Widget updateWidget(Widget Function() builder) {
@@ -52,6 +52,7 @@ Widget textField(
   bool? error,
   String? errText,
   void Function(String)? ch,
+  void Function()? cp,
   Widget? p,
   Widget? s,
   double? r,
@@ -60,6 +61,7 @@ Widget textField(
     controller: controller,
     obscureText: obscure ?? false,
     onChanged: ch,
+    onEditingComplete: cp,
     decoration: InputDecoration(
       prefixIcon: p != null
           ? Padding(padding: const EdgeInsets.all(12), child: p)
@@ -69,12 +71,8 @@ Widget textField(
           : null,
       filled: true,
       fillColor: (error ?? false) ? errorColor1 : fieldColor,
-      error: error ?? false
-          ? Text(
-              errText!,
-              style: TextStyle(fontWeight: .bold, color: errorColor2),
-            )
-          : null,
+      errorText: errText,
+      errorStyle: TextStyle(color: errorColor2),
       hintText: hintText,
       hintStyle: const TextStyle(color: eleColor),
       border: OutlineInputBorder(

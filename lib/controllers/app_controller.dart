@@ -1,10 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
-import 'package:pocket_market_module_a/common.dart';
 import 'package:pocket_market_module_a/models/product_model.dart';
-import 'package:pocket_market_module_a/models/user_model.dart';
 import 'package:pocket_market_module_a/store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -13,12 +10,24 @@ final AppController appController = AppController();
 class AppController {
   Timer? _timer;
   late SharedPreferences prefs;
-  late UserModel userModel;
   bool validToken = false;
   Set<String> selectCategories = {};
   int currentIndex = 0;
   int unreadCount = 0;
   List<ProductModel> products = [];
+  List<ProductModel> favorites = [];
+  bool favLoading = false;
+  Set<int> favIds = {};
+  Set<int> favRequesting = {};
+
+  Future<void> toggleFav(ProductModel model) async {
+    if (model.isFavorite) {
+      await d('/favorites/${model.id}');
+    } else {
+      await po('/favorites/${model.id}', {});
+    }
+    model.isFavorite = !model.isFavorite;
+  }
 
   Future<void> getNotification() async {
     try {
@@ -28,7 +37,17 @@ class AppController {
         unreadCount = body['unreadCount'];
         updateScreen();
       }
-    } catch (e, st) {}
+    } catch (e) {}
+  }
+
+  Future<void> getFavorites() async {
+    try {
+      final res = await g('/favorites');
+      final body = jsonDecode(res.body);
+      appController.favorites = (body['items'] as List)
+          .map((e) => ProductModel.fromJson(e))
+          .toList();
+    } catch (e) {}
   }
 
   void polling() async {
@@ -50,9 +69,7 @@ class AppController {
           validToken = true;
           polling();
         }
-      } catch (e, st) {}
+      } catch (e) {}
     }
   }
-
-  Future<void> query() async {}
 }

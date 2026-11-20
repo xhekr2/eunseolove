@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 import 'package:pocket_market_module_a/common.dart';
 import 'package:pocket_market_module_a/controllers/app_controller.dart';
 import 'package:pocket_market_module_a/screens/base_screen.dart';
@@ -21,11 +20,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool obsPW = true;
 
-  bool emailError = false;
-  bool passwordError = false;
-
-  // EmailErrorType? emailErrorType;
-  // PasswordErrorType? passwordErrorType;
+  String? emailError;
+  String? passwordError;
 
   @override
   void initState() {
@@ -33,23 +29,21 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void login() async {
-    // emailError = emailErrorType != null;
-    // passwordError = passwordErrorType != null;
-    emailError = false;
-    passwordError = false;
+    emailError = null;
+    passwordError = null;
     setState(() {});
 
     if (email.text.isEmpty) {
-      emailError = true;
-      setState(() {});
-      return;
+      emailError = '이메일은 필수 입력 값입니다';
     }
 
     if (password.text.isEmpty) {
-      passwordError = true;
-      setState(() {});
-      return;
+      passwordError = '비밀번호는 8자 이상 입력해 주세요.';
     }
+
+    setState(() {});
+
+    if (emailError != null || passwordError != null) return;
 
     try {
       final res = await po('/auth/login', {
@@ -91,9 +85,12 @@ class _LoginScreenState extends State<LoginScreen> {
             textField(
               email,
               'example@email.com',
-              errText: '이메일 형식이 올바르지 않습니다.',
-              error: emailError,
-              p: icon('ic_mail', c: emailError ? errorColor2 : eleColor),
+              errText: emailError,
+              error: emailError != null,
+              p: icon(
+                'ic_mail',
+                c: emailError != null ? errorColor2 : eleColor,
+              ),
             ),
             const SizedBox(height: 12),
             title('비밀번호'),
@@ -105,9 +102,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 onTap: () => setState(() => obsPW = !obsPW),
                 child: icon(obsPW ? 'ic_eye_off' : 'ic_eye', c: eleColor),
               ),
-              p: icon('ic_lock', c: passwordError ? errorColor2 : eleColor),
-              error: passwordError,
-              errText: '비밀번호는 8자 이상 입력해 주세요.',
+              error: passwordError != null,
+              p: icon(
+                'ic_lock',
+                c: passwordError != null ? errorColor2 : eleColor,
+              ),
+              errText: passwordError,
               obscure: obsPW,
             ),
             const SizedBox(height: 30),
