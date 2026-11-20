@@ -17,59 +17,66 @@ class AppController {
   List<ProductModel> products = [];
   List<ProductModel> favorites = [];
   bool favLoading = false;
-  Set<int> favIds = {};
   Set<int> favRequesting = {};
 
   Future<void> toggleFav(ProductModel model) async {
-    if (model.isFavorite) {
-      await d('/favorites/${model.id}');
-    } else {
-      await po('/favorites/${model.id}', {});
-    }
-    model.isFavorite = !model.isFavorite;
-  }
-
-  Future<void> getNotification() async {
     try {
-      final res = await g('/notifications');
-      final body = jsonDecode(res.body);
+      if (favRequesting.contains(model.id)) return;
+      final next = !model.isFavorite;
+      final res = model.isFavorite
+          ? await d('/favorites/${model.id}')
+          : await po('/favorites/${model.id}', {});
       if (res.statusCode == 200) {
-        unreadCount = body['unreadCount'];
-        updateScreen();
-      }
-    } catch (e) {}
-  }
-
-  Future<void> getFavorites() async {
-    try {
-      final res = await g('/favorites');
-      final body = jsonDecode(res.body);
-      appController.favorites = (body['items'] as List)
-          .map((e) => ProductModel.fromJson(e))
-          .toList();
-    } catch (e) {}
-  }
-
-  void polling() async {
-    if (_timer != null) return;
-    _timer = Timer.periodic(
-      const Duration(seconds: 30),
-      (_) async => await getNotification(),
-    );
-  }
-
-  Future<void> init() async {
-    prefs = await SharedPreferences.getInstance();
-    token = prefs.getString(tokenKey);
-
-    if (token != null) {
-      try {
-        final res = await g('/users/me');
-        if (res.statusCode == 200) {
-          validToken = true;
-          polling();
+        for (final p in [...products, ...favorites]) {
+          if (p.id == model.id) p.isFavorite = next;
         }
-      } catch (e) {}
+      }
+    } catch (e) {} finally {
+      favRequesting.remove(model.id);
     }
   }
 }
+
+Future<void> getNotification() async {
+  try {
+    final res = await g('/notifications');
+    final body = jsonDecode(res.body);
+    if (res.statusCode == 200) {
+      unreadCount = body['unreadCount'];
+      updateScreen();
+    }
+  } catch (e) {}
+}
+
+Future<void> getFavorites() async {
+  try {
+    final res = await g('/favorites');
+    final body = jsonDecode(res.body);
+    appController.favorites = (body['items'] as List)
+        .map((e) => ProductModel.fromJson(e))
+        .toList();
+  } catch (e) {}
+}
+
+void polling() async {
+  if (_timer != null) return;
+  _timer = Timer.periodic(
+    const Duration(seconds: 30),
+        (_) async => await getNotification(),
+  );
+}
+
+Future<void> init() async {
+  prefs = await SharedPreferences.getInstance();
+  token = prefs.getString(tokenKey);
+
+  if (token != null) {
+    try {
+      final res = await g('/users/me');
+      if (res.statusCode == 200) {
+        validToken = true;
+        polling();
+      }
+    } catch (e) {}
+  }
+}}
