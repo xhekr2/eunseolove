@@ -17,11 +17,9 @@ class AppController {
   List<ProductModel> products = [];
   List<ProductModel> favorites = [];
   bool favLoading = false;
-  Set<int> favRequesting = {};
 
   Future<void> toggleFav(ProductModel model) async {
     try {
-      if (favRequesting.contains(model.id)) return;
       final next = !model.isFavorite;
       final res = model.isFavorite
           ? await d('/favorites/${model.id}')
@@ -31,10 +29,7 @@ class AppController {
           if (p.id == model.id) p.isFavorite = next;
         }
       }
-    } catch (e) {
-    } finally {
-      favRequesting.remove(model.id);
-    }
+    } catch (e) {}
   }
 
   Future<void> getNotification() async {
